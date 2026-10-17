@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Number-to-Words-Converter</title>
+  <style>
+    :root {
+      --primary: #6558e8;
+      --primary-dark: #4d40c5;
+      --ink: #242345;
+      --muted: #77778e;
+      --border: #e7e6f4;
+      --surface: #ffffff;
+      --background: #f6f5ff;
+      --success: #13865c;
+      --danger: #c33c53;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 32px 16px;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 5% 5%, #e2ddff 0, transparent 30%),
+        radial-gradient(circle at 95% 95%, #d9f7f0 0, transparent 30%),
+        var(--background);
+    }
+
+    button, input, select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .app {
+      max-width: 850px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .logo {
+      display: inline-grid;
+      place-items: center;
+      width: 58px;
+      height: 58px;
+      margin-bottom: 12px;
+      border-radius: 19px;
+      background: linear-gradient(135deg, #8174ff, #5749d5);
+      box-shadow: 0 9px 20px #6558e833;
+      color: white;
+      font-size: 29px;
+      font-weight: 800;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 5vw, 42px);
+      letter-spacing: -1.5px;
+    }
+
+    header p {
+      max-width: 500px;
+      margin: 10px auto 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .card {
+      padding: 28px;
+      border: 1px solid #ffffff;
+      border-radius: 24px;
+      background: var(--surface);
+      box-shadow: 0 18px 50px #332b8010;
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 9px;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    input, select {
+      width: 100%;
+      min-width: 0;
+      padding: 14px 15px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      outline: none;
+      background: #fcfcff;
+      color: var(--ink);
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px #6558e81c;
+    }
+
+    input {
+      font-size: 17px;
+    }
+
+    .primary-btn {
+      flex-shrink: 0;
+      padding: 0 22px;
+      border: 0;
+      border-radius: 12px;
+      background: var(--primary);
+      color: white;
+      font-weight: 750;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .primary-btn:hover {
+      background: var(--primary-dark);
+    }
+
+    .primary-btn:active {
+      transform: scale(0.98);
+    }
+
+    .hint {
+      margin: 9px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .error {
+      min-height: 20px;
+      margin: 12px 0 0;
+      color: var(--danger);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .result {
+      margin-top: 25px;
+      padding: 23px;
+      border: 1px solid #e3e0ff;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #f8f7ff, #f2faff);
+    }
+
+    .result-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .result-label {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .result-word {
+      min-height: 70px;
+      margin: 0;
+      font-size: clamp(19px, 3vw, 26px);
+      font-weight: 700;
+      line-height: 1.65;
+      overflow-wrap: anywhere;
+    }
+
+    .copy-btn {
+      flex-shrink: 0;
+      padding: 9px 12px;
+      border: 1px solid #dedaff;
+      border-radius: 10px;
+      background: white;
+      color: var(--primary-dark);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .copy-btn:hover {
+      background: #f0eeff;
+    }
+
+    .result-meta {
+      margin-top: 15px;
+      padding-top: 14px;
+      border-top: 1px solid #e6e4f5;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .examples {
+      margin-top: 22px;
+    }
+
+    .examples h2, .logic h2 {
+      margin: 0 0 13px;
+      font-size: 16px;
+    }
+
+    .example-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 9px;
+    }
+
+    .example {
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: white;
+      color: var(--ink);
+      text-align: left;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .example:hover {
+      border-color: #bcb5ff;
+      background: #faf9ff;
+    }
+
+    .example strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+
+    .example span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .logic {
+      margin-top: 22px;
+      padding: 21px;
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      background: #ffffffb8;
+    }
+
+    .logic p, .logic li {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .logic ul {
+      padding-left: 20px;
+      margin-bottom: 0;
+    }
+
+    .footer {
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @media (max-width: 580px) {
+      body {
+        padding: 22px 12px;
+      }
+
+      .card {
+        padding: 20px;
+      }
+
+      .input-row {
+        flex-direction: column;
+      }
+
+      .primary-btn {
+        min-height: 47px;
+      }
+
+      .options {
+        grid-template-columns: 1fr;
+      }
+
+      .example-list {
+        grid-template-columns: 1fr;
+      }
+
+      .result {
+        padding: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div class="logo" aria-hidden="true">W</div>
+      <h1>Number-to-Words-Converter</h1>
+      <p>Turn numbers into words in an instant. Explore large numbers, decimals, and different numbering systems.</p>
+    </header>
+
+    <section class="card">
+      <form id="converterForm" novalidate>
+        <label class="field-label" for="numberInput">
+          Enter a number
+        </label>
+
+        <div class="input-row">
+          <input
+            id="numberInput"
+            type="text"
+            inputmode="decimal"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="e.g. 1234.56"
+            maxlength="100"
+            aria-describedby="inputHint errorMessage"
+          >
+          <button class="primary-btn" type="submit">Convert →</button>
+        </div>
+
+        <p class="hint" id="inputHint">
+          You can use commas, a leading minus sign, and up to 6 decimal places.
+        </p>
+        <p class="error" id="errorMessage" role="alert"></p>
+
+        <div class="options">
+          <div>
+            <label class="field-label" for="systemSelect">
+              Numbering system
+            </label>
+            <select id="systemSelect">
+              <option value="international">International (million, billion)</option>
+              <option value="indian">Indian (lakh, crore)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="field-label" for="decimalSelect">
+              Decimal style
+            </label>
+            <select id="decimalSelect">
+              <option value="fraction">Fractional digits (point five six)</option>
+              <option value="and">Use “and” (and fifty-six hundredths)</option>
+            </select>
+          </div>
+        </div>
+      </form>
+
+      <section class="result" aria-labelledby="resultLabel">
+        <div class="result-top">
+          <p class="result-label" id="resultLabel">Result in words</p>
+          <button class="copy-btn" id="copyBtn" type="button">
+            Copy result
+          </button>
+        </div>
+
+        <p class="result-word" id="resultWord" aria-live="polite">
+          one thousand two hundred thirty-four
+        </p>
+
+        <div class="result-meta" id="resultMeta">
+          Number: 1,234 · International system
+        </div>
+      </section>
+
+      <section class="examples">
+        <h2>Try an example</h2>
+        <div class="example-list">
+          <button class="example" type="button" data-number="0">
+            <strong>0</strong>
+            <span>Zero</span>
+          </button>
+          <button class="example" type="button" data-number="42">
+            <strong>42</strong>
+            <span>Forty-two</span>
+          </button>
+          <button class="example" type="button" data-number="1234">
+            <strong>1,234</strong>
+            <span>One thousand two hundred thirty-four</span>
+          </button>
+          <button class="example" type="button" data-number="1000000">
+            <strong>1,000,000</strong>
+            <span>One million / ten lakh</span>
+          </button>
+          <button class="example" type="button" data-number="-508.25">
+            <strong>-508.25</strong>
+            <span>Negative number with decimals</span>
+          </button>
+          <button class="example" type="button" data-number="12345678">
+            <strong>12,345,678</strong>
+            <span>Large number conversion</span>
+          </button>
+        </div>
+      </section>
+    </section>
+
+    <section class="logic">
+      <h2>🧠 How the logic works</h2>
+      <ul>
+        <li>Split the number into groups of three digits.</li>
+        <li>Convert each group into words using units, tens, and hundreds.</li>
+        <li>Attach the appropriate scale, such as thousand, million, lakh, or crore.</li>
+        <li>Handle zero, negative values, decimals, and invalid input separately.</li>
+      </ul>
+      <p>
+        This is a learning tool, not a certified financial or legal number-to-words formatter.
+      </p>
+    </section>
+
+    <p class="footer">
+      WordWise · Built with HTML, CSS and JavaScript · No external libraries
+    </p>
+  </main>
+
+  <script>
+    const numberInput = document.getElementById("numberInput");
+    const systemSelect = document.getElementById("systemSelect");
+    const decimalSelect = document.getElementById("decimalSelect");
+    const resultWord = document.getElementById("resultWord");
+    const resultMeta = document.getElementById("resultMeta");
+    const errorMessage = document.getElementById("errorMessage");
+    const copyBtn = document.getElementById("copyBtn");
+    const converterForm = document.getElementById("converterForm");
+
+    const SMALL = [
+      "zero", "one", "two", "three", "four",
+      "five", "six", "seven", "eight", "nine",
+      "ten", "eleven", "twelve", "thirteen", "fourteen",
+      "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"
+    ];
+
+    const TENS = [
+      "", "", "twenty", "thirty", "forty",
+      "fifty", "sixty", "seventy", "eighty", "ninety"
+    ];
+
+    const INTERNATIONAL_SCALES = [
+      "", "thousand", "million", "billion", "trillion",
+      "quadrillion", "quintillion", "sextillion",
+      "septillion", "octillion", "nonillion",
+      "decillion"
+    ];
+
+    // Convert an integer from 0 to 999 into English words.
+    function threeDigitsToWords(number) {
+      if (number === 0) return "";
+      if (number < 20) return SMALL[number];
+
+      if (number < 100) {
+        const ten = TENS[Math.floor(number / 10)];
+        const unit = number % 10;
+
+        return unit ? `${ten}-${SMALL[unit]}` : ten;
+      }
+
+      const hundreds = Math.floor(number / 100);
+      const remainder = number % 100;
+
+      if (remainder === 0) {
+        return `${SMALL[hundreds]} hundred`;
+      }
+
+      return `${SMALL[hundreds]} hundred ${threeDigitsToWords(remainder)}`;
+    }
+
+    // Split a whole number into groups of three digits.
+    function integerToWords(number, system) {
+      if (number === 0n) return "zero";
+
+      const groups = [];
+      let remaining = number;
+
+      while (remaining > 0n) {
+        groups.push(Number(remaining % 1000n));
+        remaining /= 1000n;
+      }
+
+      const words = [];
+
+      for (let i = groups.length - 1; i >= 0; i--) {
+        const group = groups[i];
+
+        if (group === 0) continue;
+
+        let scale;
+
+        if (system === "indian") {
+          if (i === 0) {
+            scale = "";
+          } else if (i === 1) {
+            scale = "thousand";
+          } else if (i === 2) {
+            scale = "lakh";
+          } else if (i === 3) {
+            scale = "crore";
+          } else {
+            // After crore, use the international scale names for
+            // higher groups to avoid inventing Indian scale names.
+            scale = INTERNATIONAL_SCALES[i] || `10 to the power ${i * 3}`;
+          }
+        } else {
+          scale = INTERNATIONAL_SCALES[i] ||
+            `10 to the power ${i * 3}`;
+        }
+
+        const groupWords = threeDigitsToWords(group);
+        words.push(scale ? `${groupWords} ${scale}` : groupWords);
+      }
+
+      return words.join(" ");
+    }
+
+    function parseInput(raw) {
+      const trimmed = raw.trim();
+
+      if (!trimmed) {
+        throw new Error("Please enter a number.");
+      }
+
+      // Accept standard comma grouping or plain digits, not arbitrary commas.
+      const validPattern =
+        /^-?(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d{1,6})?$/;
+
+      if (!validPattern.test(trimmed)) {
+        throw new Error(
+          "Enter a valid number. Use commas in groups of three and up to 6 decimal places."
+        );
+      }
+
+      const normalized = trimmed.replace(/,/g, "");
+      const negative = normalized.startsWith("-");
+      const unsigned = negative ? normalized.slice(1) : normalized;
+      const parts = unsigned.split(".");
+      const integerPart = parts[0];
+      const decimalPart = parts[1] || "";
+
+      // Limit the integer portion to 36 digits to keep the output manageable.
+      if (integerPart.length > 36) {
+        throw new Error("Please enter a number with no more than 36 integer digits.");
+      }
+
+      return {
+        negative,
+        integerPart: BigInt(integerPart),
+        decimalPart,
+        normalized
+      };
+    }
+
+    function numberToWords(parsed, system, decimalStyle) {
+      const {
+        negative,
+        integerPart,
+        decimalPart
+      } = parsed;
+
+      const integerWords = integerToWords(integerPart, system);
+      let result = integerWords;
+
+      if (decimalPart.length > 0) {
+        if (decimalStyle === "fraction") {
+          const decimalWords = decimalPart
+            .split("")
+            .map(digit => SMALL[Number(digit)])
+            .join(" ");
+
+          result += ` point ${decimalWords}`;
+        } else {
+          const decimalValue = BigInt(decimalPart);
+          const decimalScale = decimalPart.length;
+          const decimalNames = {
+            1: "tenths",
+            2: "hundredths",
+            3: "thousandths",
+            4: "ten-thousandths",
+            5: "hundred-thousandths",
+            6: "millionths"
+          };
+
+          // Preserve the written decimal precision, including trailing zeros.
+          const decimalWords = integerToWords(decimalValue, system);
+          result += ` and ${decimalWords} ${decimalNames[decimalScale]}`;
+        }
+      }
+
+      if (negative && (integerPart !== 0n || /[1-9]/.test(decimalPart))) {
+        result = `negative ${result}`;
+      }
+
+      return result;
+    }
+
+    function formatDisplayNumber(normalized) {
+      const [integerPart, decimalPart] = normalized.split(".");
+      const formattedInteger = BigInt(integerPart).toLocaleString("en-US");
+
+      return decimalPart === undefined
+        ? formattedInteger
+        : `${formattedInteger}.${decimalPart}`;
+    }
+
+    function convert(raw = numberInput.value) {
+      errorMessage.textContent = "";
+      copyBtn.textContent = "Copy result";
+
+      try {
+        const parsed = parseInput(raw);
+        const system = systemSelect.value;
+        const decimalStyle = decimalSelect.value;
+
+        const words = numberToWords(parsed, system, decimalStyle);
+        const displayNumber = formatDisplayNumber(parsed.normalized);
+
+        resultWord.textContent = words;
+        resultMeta.textContent =
+          `Number: ${displayNumber} · ` +
+          `${system === "indian" ? "Indian" : "International"} system`;
+
+        return words;
+      } catch (error) {
+        errorMessage.textContent = error.message;
+        resultWord.textContent = "Your result will appear here.";
+        resultMeta.textContent = "Correct the input to convert the number.";
+        return null;
+      }
+    }
+
+    converterForm.addEventListener("submit", event => {
+      event.preventDefault();
+      convert();
+    });
+
+    systemSelect.addEventListener("change", () => convert());
+    decimalSelect.addEventListener("change", () => convert());
+
+    document.querySelectorAll("[data-number]").forEach(button => {
+      button.addEventListener("click", () => {
+        numberInput.value = button.dataset.number;
+        convert();
+        numberInput.focus();
+      });
+    });
+
+    copyBtn.addEventListener("click", async () => {
+      const words = convert();
+
+      if (words === null) return;
+
+      try {
+        await navigator.clipboard.writeText(words);
+        copyBtn.textContent = "✓ Copied!";
+      } catch (error) {
+        // Fallback for browsers where Clipboard API access is unavailable.
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(resultWord);
+        selection.removeAllRanges();
+        selection.addRange(range);
+
+        copyBtn.textContent = "Select and copy";
+      }
+    });
+
+    // Show a working example when the page opens.
+    convert("1234");
+  </script>
+</body>
+</html>
